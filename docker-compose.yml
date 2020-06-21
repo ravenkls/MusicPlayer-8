@@ -10,7 +10,9 @@ services:
             POSTGRES_USER: "django"
             POSTGRES_PASSWORD: "pass1234"
             POSTGRES_DB: "django_db"
-    
+        depends_on:
+            - postgres
+
     postgres:
         image: postgres:12.3
         environment:

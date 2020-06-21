@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicPlayer 8</title>
+</head>
+<body>
+    <center>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><span id="progress">0</span>% complete<br/><br/>
+    <input type="text" id="urlInput" placeholder="Enter YouTube URL">
+    <button id="submit">Submit</button>
+    <br/><br/>
+    <audio controls></audio>
+    </center>
+
+    <script>
+        const convertSocket = new WebSocket(
+            "ws://"
+            + window.location.host
+            + "/ws/converter/"
+        );
+
+        const audioPlayer = document.querySelector("audio");
+
+        convertSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if(data.progress === 100){
+                audioPlayer.src = data.src;
+                audioPlayer.play();
+            }
+            document.querySelector("#progress").innerHTML = data.progress;
+        }
+
+        convertSocket.onclose = function(e) {
+            console.error("Websocket closed unexpectedly")
+        }
+
+        document.querySelector("#submit").onclick = function(e){
+            const urlInputDom = document.querySelector("#urlInput")
+            const url = urlInputDom.value;
+            convertSocket.send(JSON.stringify({
+                url: url
+            }))
+        }
+    </script>
+</body>
+</html>
