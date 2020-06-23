@@ -10,6 +10,9 @@ import youtube_dl
 import uuid
 
 
+youtube_dl.utils.bug_reports_message = lambda: ''
+
+
 class ConvertConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
@@ -23,14 +26,18 @@ class ConvertConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         url = text_data_json['url']
 
-        file_path, file = self.convert(url)
-        file_url = os.path.join(settings.MEDIA_URL, "songs", file)
-        self.generated_files.append(file_path)
+        data = self.convert(url)
+        if data:
+            file_path, file = data
 
-        self.send(text_data=json.dumps({
-            "progress": 100,
-            "src": file_url,
-        }))
+            file_url = os.path.join(settings.MEDIA_URL, "songs", file)
+            self.generated_files.append(file_path)
+
+            self.send(text_data=json.dumps({
+                "progress": 100,
+                "src": file_url,
+                "status": "Conversion Complete",
+            }))
 
     def download_hook(self, data):
         if data['status'] == 'finished':
@@ -39,7 +46,8 @@ class ConvertConsumer(WebsocketConsumer):
             percent = int(float(data["_percent_str"][:-1].strip())*.5)
         
         self.send(text_data=json.dumps({
-            "progress": percent
+            "progress": percent,
+            "status": f"Downloading Song ({percent*2}%)",
         }))
 
     def convert(self, url, *, delay=150):
@@ -55,7 +63,14 @@ class ConvertConsumer(WebsocketConsumer):
             'progress_hooks': [self.download_hook]
         })
 
-        data = ytdl.extract_info(url)
+        try:
+            data = ytdl.extract_info(url)
+        except youtube_dl.utils.DownloadError:
+            self.send(text_data=json.dumps({
+                "status": "fail"
+            }))
+            return False
+
         file_path = os.path.join(settings.MEDIA_ROOT, 'downloaded_songs', f'{data.get("id")}.m4a')
 
         path, ext = os.path.splitext(file_path)
@@ -70,20 +85,23 @@ class ConvertConsumer(WebsocketConsumer):
         b = silent.append(b)
 
         self.send(text_data=json.dumps({
-            "progress": 60
+            "progress": 60,
+            "status": "Converting to 4D Audio",
         }))
 
         left = a.pan(-1)
         right = b.pan(+1)
         
         self.send(text_data=json.dumps({
-            "progress": 70
+            "progress": 70,
+            "status": "Converting to 4D Audio",
         }))
 
         remixed = left.overlay(right)
 
         self.send(text_data=json.dumps({
-            "progress": 80
+            "progress": 80,
+            "status": "Converting to 4D Audio",
         }))
         
         compressed = remixed.set_frame_rate(int(remixed.frame_rate // 2))

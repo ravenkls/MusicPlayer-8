@@ -1,0 +1,115 @@
+// VARIABLES
+$primary: #9565e8;
+$background: white;
+
+// GLOBAL
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: $background;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+// HOME PAGE
+section#main {
+    height: 100%;
+    text-align: center;
+    flex-direction: column;
+    max-width: 1200px;
+    width: 90%;
+    margin: 100px auto;
+
+    .logo{
+        img{
+            width: 80%;
+            max-width: 600px;
+        }
+    }
+
+    .subtitle{
+        font-size: 2em;
+        opacity: .6;
+        margin-bottom: 3em;
+    }
+
+
+    .card{
+        max-width: 900px;
+        width: 90%;
+        margin: auto;
+        padding: 2em;
+        box-shadow: 0 3px 38px rgba(0, 0, 0, 0.1);
+
+        label{
+            display: block;
+            text-align: left;
+            margin-bottom: .5em;
+            opacity: .8;
+        }
+    
+        .inline-inputs {
+    
+            display: flex;
+    
+            .progressBar {
+                position: relative;
+                box-sizing: border-box;
+                flex: 1;
+                margin-right: 1em;
+    
+                input#urlInput {
+                    width: 100%;
+                    height: 100%;
+                    box-sizing: border-box;
+                    padding: 1em;
+                    outline: 0;
+                    border: 1px solid rgba(0, 0, 0, 0.3);
+
+                    &::placeholder{
+                        opacity: .4;
+                    }
+
+                    &:focus{
+                        border: 1px solid $primary;
+                    }
+                }
+    
+                .bg {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%;
+                    width: 0%;
+                    background: rgba($primary, 0.5);
+                    transition: 0.5s;
+                }
+            }
+    
+            button#submit{
+                background: $primary;
+                color: white;
+                font-size: 1.5em;
+                font-family: Staatliches;
+                border: none;
+                padding: 0 .8em;
+                outline: 0;
+                transition: .3s;
+
+                &:enabled{
+                    cursor: pointer;
+                }
+
+                &:hover:enabled{
+                    background: darken($primary, 10%);
+                }
+
+                &:active:enabled{
+                    background: darken($primary, 15%);
+                }
+            }
+    
+        }
+    }
+}
