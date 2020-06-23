@@ -7,6 +7,9 @@ A simple web app that converts songs from YouTube or soundcloud (anything that Y
 rendition. This is done by delaying the left channel by approximately 100 miliseconds, this of course means that the
 effect only works using headphones with a left and right channel.
 
+## Screenshots
+<img src="https://i.imgur.com/XuGJdHK.png">
+
 ## Installation
 
 ### Requirements
