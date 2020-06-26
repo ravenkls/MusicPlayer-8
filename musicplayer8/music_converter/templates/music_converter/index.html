@@ -19,6 +19,7 @@
         <div class="card">
             <label for="urlInput" id="loadingLabel">Enter YouTube URL</label>
             <div class="inline-inputs">
+                <button id="play"><i class="fa fa-play"></i></button>
                 <div class="progressBar">
                     <input type="text" id="urlInput" placeholder="http://www.youtube.com/watch?v=ABCDEFG">
                     <div class="bg"></div>
@@ -26,8 +27,9 @@
                 <button id="submit">GO</button>
             </div>
         </div>
+
+        <audio></audio>
     
-        <audio controls style="display: none;"></audio>
     </section>
 
     <script
@@ -36,27 +38,78 @@
     crossorigin="anonymous"></script>
 
     <script>
+        const audioPlayer = document.querySelector("audio")
+
+        // controls
+
+        let audioPlayerShown = false;
+        const playButton = document.querySelector("#play")
+        const seeker = document.querySelector(".bg")
+        const duration = document.querySelector("#submit")
+
+        function togglePlayback(){
+            if(audioPlayer.paused){
+                // Play
+                playButton.innerHTML = '<i class="fa fa-pause"></i>';
+                audioPlayer.play();
+            } else {
+                // Pause
+                playButton.innerHTML = '<i class="fa fa-play"></i>';
+                audioPlayer.pause();
+            }
+        }
+
+        document.querySelector("#urlInput").addEventListener("click", seek);
+
+        function seek(e){
+            if(audioPlayerShown){
+                const x = e.pageX - $('#urlInput').offset().left;
+                const percent = x / $('#urlInput').outerWidth();
+                const newPos = percent * audioPlayer.duration;
+                audioPlayer.pause();
+                audioPlayer.currentTime = newPos;
+                audioPlayer.play();
+            }
+        }
+
+        audioPlayer.ontimeupdate = function(e){
+            let progress = (audioPlayer.currentTime / audioPlayer.duration)*100
+            $(seeker).css("width", progress + "%");
+            duration.innerHTML = new Date(audioPlayer.currentTime * 1000).toISOString().substr(14, 5)
+        }
+
+        playButton.onclick = togglePlayback
+
+
+        // downloader
+        function showPlayer(){
+            $(playButton).fadeIn(100).css("width", "auto");
+            $(seeker).css("height", "20%").css("top", "40%");
+            duration.setAttribute("disabled", "")
+            $(duration).css("width", "90px");
+            $("#urlInput").css("opacity", "0").css("cursor", "pointer");
+
+            audioPlayerShown = true;
+        }
+
         const convertSocket = new WebSocket(
             "ws://"
             + window.location.host
             + "/ws/converter/"
         );
 
-        const audioPlayer = document.querySelector("audio");
-
         convertSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             if (data.status === "fail"){
                 document.querySelector("#submit").removeAttribute("disabled");
-                document.querySelector("#urlInput").removeAttribute("disabled");
+                $("#urlInput").prop('readonly', false);
                 document.querySelector("#submit").classList.remove("active");
                 document.querySelector("#loadingLabel").innerHTML = "Enter YouTube URL";
             }else if(data.progress === 100){
                 setTimeout(function(){
                     audioPlayer.src = data.src;
-                    audioPlayer.play();
-                    $(audioPlayer).fadeIn(100)
-                    $(".form").hide();
+                    togglePlayback();
+                    showPlayer();
                     document.querySelector("#loadingLabel").innerHTML = "Status: Complete";
                 }, 1000);
             }else{
@@ -78,10 +131,9 @@
             const urlInputDom = document.querySelector("#urlInput")
             const url = urlInputDom.value;
             convertSocket.send(JSON.stringify({ url }))
-            document.querySelector("#urlInput").setAttribute("disabled", "");
+            $("#urlInput").prop('readonly', true);
         }
 
-        // controls
     </script>
 </body>
 </html>

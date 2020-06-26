@@ -59,7 +59,6 @@ section#main .card .inline-inputs .progressBar {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  margin-right: 1em;
 }
 
 section#main .card .inline-inputs .progressBar input#urlInput {
@@ -101,9 +100,10 @@ section#main .card .inline-inputs .progressBar .bg {
   background: rgba(149, 101, 232, 0.5);
   -webkit-transition: 0.5s;
   transition: 0.5s;
+  pointer-events: none;
 }
 
-section#main .card .inline-inputs button#submit {
+section#main .card .inline-inputs button {
   background: #9565e8;
   color: white;
   font-size: 1.5em;
@@ -115,15 +115,25 @@ section#main .card .inline-inputs button#submit {
   transition: .3s;
 }
 
-section#main .card .inline-inputs button#submit:enabled {
+section#main .card .inline-inputs button:enabled {
   cursor: pointer;
 }
 
-section#main .card .inline-inputs button#submit:hover:enabled {
+section#main .card .inline-inputs button:hover:enabled {
   background: #7639e1;
 }
 
-section#main .card .inline-inputs button#submit:active:enabled {
+section#main .card .inline-inputs button:active:enabled {
   background: #6722de;
+}
+
+section#main .card button#submit {
+  margin-left: 1em;
+}
+
+section#main .card button#play {
+  margin-right: 1em;
+  width: 0%;
+  display: none;
 }
 /*# sourceMappingURL=main.css.map */
